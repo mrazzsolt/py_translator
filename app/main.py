@@ -25,20 +25,30 @@ app.add_middleware(
 def index(request: Request):
     return templates.TemplateResponse("index.html",{"request":request})
 
-@app.post("/translate",response_model=schemas.TranslationRequest)
-def translate(request:schemas.TranslationRequest,background_tasks: BackgroundTasks,db: Session = Depends(get_db)):
-    task = crud.create_translation_task(db,request.text,request.languages)
-    background_tasks.add_task(perform_translation,task.id,request.text,request.languages,db)
-    return {"task_id": task.id,
+@app.post("/translate", response_model=schemas.TranslationResponsePOST)
+def translate(request: schemas.TranslationRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    task = crud.create_translation_task(db, request.text, request.languages)
+    background_tasks.add_task(perform_translation, task.id, request.text, request.languages, db)
+    print("Received text:", request.text)
+    print("Languages:", request.languages)
+    return {
+        "task_id": task.id,
         "text": task.text,
-        "languages": task.languages}
+        "languages": task.languages
+    }
 
-@app.get("/translate/{task_id}",response_model=schemas.TranslationStatus)
+@app.get("/translate/{task_id}", response_model=schemas.TranslationResponseGET)
 def get_translate(task_id: int, db: Session = Depends(get_db)):
-    task = crud.get_translation_task(db,task_id)
+    task = crud.get_translation_task(db, task_id)
     if not task:
-        raise HTTPException(status_code=404,detail="task not found")
-    return {"task_id":{task.id},"status": task.status, "translation":task.translations}
+        raise HTTPException(status_code=404, detail="Task not found")
+    return {
+        "task_id": task.id,
+        "status": task.status,
+        "translation": task.translation,
+        "text": task.text
+    }
+
 
 @app.get("/translate/content/{task_id}",response_model=schemas.TranslationStatus)
 def get_translate_content(task_id: int, db: Session = Depends(get_db)):

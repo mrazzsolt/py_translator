@@ -70,10 +70,10 @@
                 </div>
                 <div class="form-group">
                 <label for="languages">Languages</label>
-                <textarea class = "form-control" id="textToTranslate" rows="4" placeholder="eg. en,de,cz"></textarea>
+                <textarea class="form-control" id="languages" rows="2" placeholder="eg. en,de,cz"></textarea>
                 </div>
                 <div class="btn-container">
-                <button class="btn btn-primary" onclick="submitTranslation()">Translate</button>
+                <button type="button" class="btn btn-primary" onclick="submitTranslation()">Translate</button>
                 </div>
             </form>
             <div class="mt-4" id = "results" style="display: none;">
@@ -102,12 +102,12 @@
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/acios/dist/axios.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <script>
           async function submitTranslation() {
             const text = document.getElementById('textToTranslate').value;
             const languages = document.getElementById('languages').value.split(',').map(lang=>lang.trim());
-            if (!text||languages===0||languages[0] ===""){
+            if (!text || languages.length === 0 || languages[0] === "") {
               alert("Please provide both text and target language.");
               return;
             }
@@ -121,10 +121,11 @@
           progressText.textContent = 'Translation in progress..';
 
           try{
-            const response = await axios.post('localhost:8000/translate',{
+            const response = await axios.post('http://localhost:8000/translate',{
               text:text,
               languages:languages
             });
+            console.log("POST response:", response.data);
             const taskId = response.data.task_id;
             alert(`Task ID: ${taskId}`);
           document.getElementById('progress-container').style.display = 'block';
@@ -136,14 +137,14 @@
           let progress = 0;
           while(progress<100){
             await new Promise(resolve => setTimeout(resolve,1000));
-            const resultResponse = await axios.get(`localhost:8000/translate)${taskId}`);
+            const resultResponse = await axios.get(`http://localhost:8000/translate/${taskId}`);
             translationResult = resultResponse.data;
-            if (translationResult === 'completed')
-          {
-            progress = 100;
-          }
+            if (translationResult.status === 'completed') {
+              progress = 100;
+            }
+
           else{
-            progress.style.width = `50%`;
+            progressBar.style.width = `50%`;
           }
         
           }

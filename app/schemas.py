@@ -13,3 +13,14 @@ class TranslationStatus(BaseModel):
     task_id: int
     status: str
     translations: Dict[str,str]
+
+class TranslationResponsePOST(BaseModel):
+    task_id: int
+    text: str
+    languages: List[str]
+
+class TranslationResponseGET(BaseModel):
+    task_id: int
+    status: str
+    translation: Dict[str, str]
+    text: str
