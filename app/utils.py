@@ -13,9 +13,9 @@ def perform_translation(task_id: int, text: str, Languages: list, db: Session):
     for lang in Languages:
         try:
             response = client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="gpt-3.5-turbo-1106",
                 messages=[
-                    {"role": "system", "content": f"You are a helpful assistant that translates text into {lang}."},
+                    {"role": "system", "content": f"You are a helpful assistant that translates text into {lang}. Give back only the translated text."},
                     {"role": "user", "content": text}
                 ],
                 max_tokens=1000

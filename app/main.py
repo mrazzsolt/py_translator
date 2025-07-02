@@ -8,10 +8,15 @@ import crud
 import models
 from utils import perform_translation
 from database import get_db,engine
+from fastapi.staticfiles import StaticFiles
+
+
+
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
@@ -55,4 +60,8 @@ def get_translate_content(task_id: int, db: Session = Depends(get_db)):
     task = crud.get_translation_task(db,task_id)
     if not task:
         raise HTTPException(status_code=404,detail="task not found")
-    return {task}
+    return {
+    "task_id": task.id,
+    "status": task.status,
+    "translations": task.translation
+    }
