@@ -1,6 +1,6 @@
 # py_translator
 
-**py_translator** is a simple FastAPI-based text translation service written in Python. It provides a REST API to translate texts between different languages.
+**py_translator** is a simple FastAPI-based text translation service written in Python. It provides a REST API to translate texts between different languages. It uses OPENAI api to translate the text.
 
 ---
 
